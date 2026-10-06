@@ -1979,18 +1979,140 @@ def _collect_scope_bindings(body, scope):
 
 
 def _scan_scope_loads(node, scope, issues, builtins_set):
-    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda)):
+
+    # -----------------------------------------------------
+    # CLASS DEFINITIONS
+    # -----------------------------------------------------
+    # Do not skip the class bases.
+    # Example:
+    # class Day(Enum):
+    #
+    # If Enum is not imported/defined, it must be reported.
+    # -----------------------------------------------------
+
+    if isinstance(node, ast.ClassDef):
+
+        # Check base classes
+        for base in node.bases:
+            _scan_scope_loads(
+                base,
+                scope,
+                issues,
+                builtins_set
+            )
+
+        # Check decorators
+        for decorator in node.decorator_list:
+            _scan_scope_loads(
+                decorator,
+                scope,
+                issues,
+                builtins_set
+            )
+
+        # Check keyword arguments in class definition
+        for keyword in node.keywords:
+            _scan_scope_loads(
+                keyword.value,
+                scope,
+                issues,
+                builtins_set
+            )
+
         return
-    if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load):
-        if node.id not in builtins_set and not scope.contains(node.id):
-            issues.append(_issue(
-                "Error", "Undefined Name", node.lineno,
-                f"`{node.id}` is used but is not defined or imported in the reachable scope.",
-                f"Define or import `{node.id}` before using it.",
-            ))
+
+    # -----------------------------------------------------
+    # FUNCTION DEFINITIONS
+    # -----------------------------------------------------
+
+    if isinstance(
+        node,
+        (
+            ast.FunctionDef,
+            ast.AsyncFunctionDef,
+            ast.Lambda
+        )
+    ):
+
+        # Function decorators can contain names
+        if isinstance(
+            node,
+            (
+                ast.FunctionDef,
+                ast.AsyncFunctionDef
+            )
+        ):
+
+            for decorator in node.decorator_list:
+
+                _scan_scope_loads(
+                    decorator,
+                    scope,
+                    issues,
+                    builtins_set
+                )
+
+            # Default arguments
+            for default in node.args.defaults:
+
+                _scan_scope_loads(
+                    default,
+                    scope,
+                    issues,
+                    builtins_set
+                )
+
+            for default in node.args.kw_defaults:
+
+                if default is not None:
+
+                    _scan_scope_loads(
+                        default,
+                        scope,
+                        issues,
+                        builtins_set
+                    )
+
         return
+
+    # -----------------------------------------------------
+    # NAME USAGE
+    # -----------------------------------------------------
+
+    if isinstance(node, ast.Name) and isinstance(
+        node.ctx,
+        ast.Load
+    ):
+
+        if (
+            node.id not in builtins_set
+            and not scope.contains(node.id)
+        ):
+
+            issues.append(
+                _issue(
+                    "Error",
+                    "Undefined Name",
+                    node.lineno,
+                    f"`{node.id}` is used but is not defined or imported in the reachable scope.",
+                    f"Define or import `{node.id}` before using it."
+                )
+            )
+
+        return
+
+    # -----------------------------------------------------
+    # CHECK CHILD NODES
+    # -----------------------------------------------------
+
     for child in ast.iter_child_nodes(node):
-        _scan_scope_loads(child, scope, issues, builtins_set)
+
+        _scan_scope_loads(
+            child,
+            scope,
+            issues,
+            builtins_set
+        )
 
 
 def _python_undefined_names(tree):
@@ -6500,8 +6622,9 @@ def change_password():
     finally:
 
         connection.close()
+
 # =========================================================
-# CLEAR ANALYSIS HISTORY
+# CLEAR USER HISTORY
 # =========================================================
 
 @app.route("/api/profile/clear-history", methods=["POST"])
@@ -6512,39 +6635,65 @@ def clear_analysis_history():
 
     try:
 
+        user_id = session["user_id"]
+
         # -------------------------------------------------
-        # Delete analysis history if table exists
+        # DELETE USER'S SAVED CODE
         # -------------------------------------------------
 
         connection.execute(
             """
-            DELETE FROM analysis_history
+            DELETE FROM saved_code
             WHERE user_id = ?
             """,
-            (session["user_id"],)
+            (user_id,)
+        )
+
+        # -------------------------------------------------
+        # DELETE USER'S REPORTS
+        # -------------------------------------------------
+
+        connection.execute(
+            """
+            DELETE FROM reports
+            WHERE user_id = ?
+            """,
+            (user_id,)
+        )
+
+        # -------------------------------------------------
+        # DELETE USER'S ANALYSIS HISTORY
+        # -------------------------------------------------
+
+        connection.execute(
+            """
+            DELETE FROM analyses
+            WHERE user_id = ?
+            """,
+            (user_id,)
         )
 
         connection.commit()
 
-        connection.close()
-
         return jsonify({
             "success": True,
-            "message": "Analysis history cleared successfully."
+            "message": "Analysis history, saved code and reports cleared successfully."
         })
 
-
-    except Exception as e:
-
-        print("CLEAR HISTORY ERROR:", e)
+    except Exception as error:
 
         connection.rollback()
-        connection.close()
+
+        print("CLEAR HISTORY ERROR:", error)
 
         return jsonify({
             "success": False,
-            "message": "Unable to clear analysis history."
+            "message": "Unable to clear history."
         }), 500
+
+    finally:
+
+        connection.close()
 
 @app.route("/api/profile/delete-account", methods=["POST"])
 @login_required
@@ -6614,35 +6763,7 @@ def delete_account():
     finally:
         connection.close()
 
-# =========================================================
-# SETTINGS
-# =========================================================
 
-@app.route("/settings")
-@login_required
-def settings():
-
-    user = get_current_user()
-
-    first_letter = "U"
-
-
-    if user:
-
-        name = (
-            user["full_name"]
-            or user["username"]
-            or "User"
-        )
-
-        first_letter = name[0].upper()
-
-
-    return render_template(
-        "settings.html",
-        user=user,
-        first_letter=first_letter
-    )
 
 
 # =========================================================
@@ -6653,93 +6774,6 @@ def settings():
 @app.route("/help-support")
 def help_support():
     return render_template("help.html")
-
-
-
-# =========================================================
-# HISTORY
-# =========================================================
-
-@app.route("/history")
-@login_required
-def history():
-
-    user = get_current_user()
-
-    first_letter = "U"
-
-
-    if user:
-
-        name = (
-            user["full_name"]
-            or user["username"]
-            or "User"
-        )
-
-        first_letter = name[0].upper()
-
-
-    return render_template(
-        "history.html",
-        user=user,
-        first_letter=first_letter
-    )
-
-
-# =========================================================
-# DELETE ANALYSIS HISTORY
-# =========================================================
-
-@app.route(
-    "/api/analysis/<int:analysis_id>",
-    methods=["DELETE"]
-)
-@login_required
-def delete_analysis(
-    analysis_id
-):
-
-    connection = get_db()
-
-
-    cursor = connection.execute(
-        """
-        DELETE FROM analyses
-        WHERE
-            id = ?
-            AND user_id = ?
-        """,
-        (
-            analysis_id,
-            session["user_id"]
-        )
-    )
-
-
-    connection.commit()
-
-    deleted = cursor.rowcount
-
-    connection.close()
-
-
-    if deleted == 0:
-
-        return jsonify({
-            "success": False,
-            "message":
-                "Analysis not found."
-        }), 404
-
-
-    return jsonify({
-
-        "success": True,
-
-        "message":
-            "Analysis deleted successfully."
-    })
 
 
 
