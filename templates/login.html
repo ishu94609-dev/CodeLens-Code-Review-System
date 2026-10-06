@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Login - Code Review System</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/login.css') }}?v=26">
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+</head>
+
+<body>
+
+<div class="page">
+
+
+<!-- =====================================================
+     LOGO
+     ===================================================== -->
+
+<div class="logo-container">
+
+    <img
+        src="{{ url_for('static', filename='images/logo.png') }}"
+        alt="CodeLens Logo"
+    >
+
+</div>
+
+
+<!-- =====================================================
+     LOGIN CARD
+     ===================================================== -->
+
+<div class="login-card">
+
+    <h2>Welcome Back</h2>
+
+    <p class="subtitle">
+        Login to your account
+    </p>
+
+
+    <!-- =================================================
+         LOGIN FORM
+         ================================================= -->
+
+    <form
+        method="POST"
+        action="{{ url_for('login') }}"
+        autocomplete="off"
+    >
+
+        <!-- USERNAME -->
+
+        <div class="input-box">
+
+            <div class="input-icon">
+                <i class="fa-regular fa-user"></i>
+            </div>
+
+            <input
+                type="text"
+                name="username"
+                id="loginUsername"
+                placeholder="Username or Email"
+                autocomplete="new-username"
+                autocapitalize="none"
+                autocorrect="off"
+                spellcheck="false"
+                required
+            >
+
+        </div>
+
+
+        <!-- PASSWORD -->
+
+        <div class="input-box">
+
+            <div class="input-icon">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+
+            <input
+                type="password"
+                name="password"
+                id="loginPassword"
+                placeholder="Password"
+                autocomplete="new-password"
+                autocapitalize="none"
+                autocorrect="off"
+                spellcheck="false"
+                required
+            >
+
+            <button
+                type="button"
+                class="eye-button"
+                onclick="toggleLoginPassword()"
+                aria-label="Show or hide password"
+            >
+
+                <i
+                    class="fa-regular fa-eye"
+                    id="loginEye"
+                ></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             OPTIONS
+             ================================================= -->
+
+        <div class="login-options">
+
+            <label class="remember-me">
+
+                <input
+                    type="checkbox"
+                    name="remember"
+                >
+
+                <span>
+                    Remember me
+                </span>
+
+            </label>
+
+
+            <!-- FORGOT PASSWORD -->
+
+            <a
+                href="#"
+                class="forgot-password"
+                id="forgotPasswordLink"
+            >
+                Forgot Password?
+            </a>
+
+        </div>
+
+
+        <!-- LOGIN BUTTON -->
+
+        <button
+            type="submit"
+            class="login-button"
+        >
+            Login
+        </button>
+
+    </form>
+
+
+    <!-- =================================================
+         DIVIDER
+         ================================================= -->
+
+    <div class="divider">
+
+        <span></span>
+
+        <p>or</p>
+
+        <span></span>
+
+    </div>
+
+
+    <!-- =================================================
+         GOOGLE LOGIN
+         ================================================= -->
+
+    <a
+        href="{{ url_for('google_login') }}"
+        class="google-button"
+    >
+
+        <span class="google-icon">
+            G
+        </span>
+
+        <span>
+            Login with Google
+        </span>
+
+    </a>
+
+
+    <!-- =================================================
+         REGISTER
+         ================================================= -->
+
+    <div class="register-text">
+
+        Don't have an account?
+
+        <a href="{{ url_for('register') }}">
+            Register here
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     FOOTER
+     ===================================================== -->
+
+<div class="footer">
+
+    <div class="footer-line">
+
+        <span>
+            © 2026 Code Review  System.
+        </span>
+
+    </div>
+
+    <div class="footer-rights">
+        All rights reserved.
+    </div>
+
+</div>
+
+
+</div>
+
+<!-- =========================================================
+     FORGOT PASSWORD POPUP
+     ========================================================= -->
+
+<div
+    class="forgot-modal"
+    id="forgotPasswordModal"
+    aria-hidden="true"
+>
+
+
+<div
+    class="forgot-box"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="forgotPasswordTitle"
+>
+
+    <!-- CLOSE -->
+
+    <button
+        type="button"
+        class="forgot-close"
+        id="closeForgotPassword"
+        aria-label="Close"
+    >
+        &times;
+    </button>
+
+
+    <!-- ICON -->
+
+    <div class="forgot-icon">
+
+        <i class="fa-solid fa-lock"></i>
+
+    </div>
+
+
+    <!-- TITLE -->
+
+    <h3 id="forgotPasswordTitle">
+        Forgot Password?
+    </h3>
+
+
+    <!-- DESCRIPTION -->
+
+    <p>
+        Enter your registered email address to reset your password.
+    </p>
+
+
+    <!-- EMAIL -->
+
+    <input
+        type="email"
+        id="forgotEmail"
+        placeholder="Enter your email"
+        autocomplete="off"
+        autocapitalize="none"
+        autocorrect="off"
+        spellcheck="false"
+    >
+
+
+    <!-- SEND BUTTON -->
+
+    <button
+        type="button"
+        class="forgot-submit"
+        id="forgotSubmit"
+    >
+        Send Reset Link
+    </button>
+
+</div>
+
+
+</div>
+
+<!-- =========================================================
+     SUCCESS POPUP
+     ========================================================= -->
+
+<div
+    class="success-popup-overlay"
+    id="successPopup"
+    aria-hidden="true"
+>
+
+
+<div
+    class="success-popup"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="successPopupTitle"
+>
+
+    <!-- SUCCESS ICON -->
+
+    <div class="success-popup-icon">
+
+        <i class="fa-solid fa-check"></i>
+
+    </div>
+
+
+    <!-- TITLE -->
+
+    <h3 id="successPopupTitle">
+        Success
+    </h3>
+
+
+    <!-- MESSAGE -->
+
+    <p id="successPopupMessage">
+        Password reset link has been sent to your email.
+    </p>
+
+
+    <!-- OK BUTTON -->
+
+    <button
+        type="button"
+        id="successPopupOk"
+    >
+        OK
+    </button>
+
+</div>
+
+
+</div>
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+
+/* =========================================================
+   PASSWORD SHOW / HIDE
+   ========================================================= */
+
+function toggleLoginPassword() {
+
+    const password =
+        document.getElementById("loginPassword");
+
+    const eye =
+        document.getElementById("loginEye");
+
+    if (!password || !eye) {
+        return;
+    }
+
+
+    if (password.type === "password") {
+
+        password.type = "text";
+
+        eye.classList.remove("fa-eye");
+
+        eye.classList.add("fa-eye-slash");
+
+    }
+
+    else {
+
+        password.type = "password";
+
+        eye.classList.remove("fa-eye-slash");
+
+        eye.classList.add("fa-eye");
+
+    }
+
+}
+
+
+/* =========================================================
+   FORGOT PASSWORD ELEMENTS
+   ========================================================= */
+
+const forgotPasswordLink =
+    document.getElementById("forgotPasswordLink");
+
+const forgotPasswordModal =
+    document.getElementById("forgotPasswordModal");
+
+const closeForgotPassword =
+    document.getElementById("closeForgotPassword");
+
+const forgotSubmit =
+    document.getElementById("forgotSubmit");
+
+const forgotEmail =
+    document.getElementById("forgotEmail");
+
+
+/* =========================================================
+   SUCCESS POPUP ELEMENTS
+   ========================================================= */
+
+const successPopup =
+    document.getElementById("successPopup");
+
+const successPopupMessage =
+    document.getElementById("successPopupMessage");
+
+const successPopupOk =
+    document.getElementById("successPopupOk");
+
+
+/* =========================================================
+   SUCCESS POPUP OK
+   ========================================================= */
+
+if (successPopupOk) {
+
+    successPopupOk.addEventListener(
+        "click",
+        function () {
+
+            closeSuccessPopup();
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   OPEN FORGOT PASSWORD POPUP
+   ========================================================= */
+
+if (forgotPasswordLink) {
+
+    forgotPasswordLink.addEventListener(
+        "click",
+        function (event) {
+
+            event.preventDefault();
+
+            if (!forgotPasswordModal) {
+                return;
+            }
+
+            forgotPasswordModal.classList.add("show");
+
+            forgotPasswordModal.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+            setTimeout(function () {
+
+                if (forgotEmail) {
+                    forgotEmail.focus();
+                }
+
+            }, 100);
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CLOSE FORGOT PASSWORD POPUP
+   ========================================================= */
+
+if (closeForgotPassword) {
+
+    closeForgotPassword.addEventListener(
+        "click",
+        function () {
+
+            closeForgotModal();
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CLOSE FORGOT MODAL
+   ========================================================= */
+
+function closeForgotModal() {
+
+    if (!forgotPasswordModal) {
+        return;
+    }
+
+    forgotPasswordModal.classList.remove("show");
+
+    forgotPasswordModal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+    if (forgotEmail) {
+
+        forgotEmail.value = "";
+
+    }
+
+}
+
+
+/* =========================================================
+   CLICK OUTSIDE FORGOT POPUP
+   ========================================================= */
+
+if (forgotPasswordModal) {
+
+    forgotPasswordModal.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                event.target ===
+                forgotPasswordModal
+            ) {
+
+                closeForgotModal();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ESCAPE KEY
+   ========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (event.key !== "Escape") {
+            return;
+        }
+
+
+        if (
+            forgotPasswordModal &&
+            forgotPasswordModal.classList.contains("show")
+        ) {
+
+            closeForgotModal();
+
+            return;
+
+        }
+
+
+        if (
+            successPopup &&
+            successPopup.classList.contains("show")
+        ) {
+
+            closeSuccessPopup();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SEND RESET LINK
+   ========================================================= */
+
+if (forgotSubmit) {
+
+    forgotSubmit.addEventListener(
+        "click",
+        async function () {
+
+            console.log(
+                "FORGOT PASSWORD BUTTON CLICKED"
+            );
+
+
+            const email =
+                forgotEmail
+                    ? forgotEmail.value.trim()
+                    : "";
+
+
+            /* =================================================
+               EMPTY EMAIL
+               ================================================= */
+
+            if (!email) {
+
+                alert(
+                    "Please enter your registered email address."
+                );
+
+                if (forgotEmail) {
+                    forgotEmail.focus();
+                }
+
+                return;
+
+            }
+
+
+            /* =================================================
+               EMAIL VALIDATION
+               ================================================= */
+
+            const emailPattern =
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+            if (!emailPattern.test(email)) {
+
+                alert(
+                    "Please enter a valid email address."
+                );
+
+                if (forgotEmail) {
+                    forgotEmail.focus();
+                }
+
+                return;
+
+            }
+
+
+            /* =================================================
+               BUTTON LOADING
+               ================================================= */
+
+            const originalText =
+                forgotSubmit.textContent;
+
+
+            forgotSubmit.disabled = true;
+
+            forgotSubmit.textContent =
+                "Sending...";
+
+
+            try {
+
+                console.log(
+                    "Sending request to /forgot-password"
+                );
+
+
+                const response =
+                    await fetch(
+                        "/forgot-password",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json",
+
+                                "Accept":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                email: email
+                            })
+                        }
+                    );
+
+
+                console.log(
+                    "Forgot password response:",
+                    response.status
+                );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "Forgot password data:",
+                    data
+                );
+
+
+                /* =================================================
+                   ERROR
+                   ================================================= */
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+
+                    alert(
+                        data.message ||
+                        "Unable to send reset link. Please try again."
+                    );
+
+                    return;
+
+                }
+
+
+                /* =================================================
+                   SUCCESS
+                   ================================================= */
+
+                showSuccessPopup(
+                    data.message ||
+                    "Password reset link has been sent to your email."
+                );
+
+
+                closeForgotModal();
+
+            }
+
+
+            catch (error) {
+
+                console.error(
+                    "Forgot Password Error:",
+                    error
+                );
+
+
+                alert(
+                    "Unable to connect to the server. Please try again."
+                );
+
+            }
+
+
+            finally {
+
+                forgotSubmit.disabled = false;
+
+                forgotSubmit.textContent =
+                    originalText;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   SHOW SUCCESS POPUP
+   ========================================================= */
+
+function showSuccessPopup(message) {
+
+    if (!successPopup) {
+        return;
+    }
+
+
+    if (successPopupMessage) {
+
+        successPopupMessage.textContent =
+            message;
+
+    }
+
+
+    successPopup.classList.add("show");
+
+    successPopup.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+}
+
+
+/* =========================================================
+   CLOSE SUCCESS POPUP
+   ========================================================= */
+
+function closeSuccessPopup() {
+
+    if (!successPopup) {
+        return;
+    }
+
+
+    successPopup.classList.remove("show");
+
+    successPopup.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+}
+
+
+</script>
+
+</body>
+
+</html>

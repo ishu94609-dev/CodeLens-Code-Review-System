@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Results - CodeLens</title>
+
+
+    <!-- Flaticon Regular Rounded -->
+    <link rel="stylesheet"
+          href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+
+
+    <!-- Flaticon Solid Rounded -->
+    <link rel="stylesheet"
+          href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
+
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+
+    <!-- Dashboard CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+
+
+    <!-- Results CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/results.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-wrapper results-page dark-blue-ui">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar" id="sidebar">
+
+
+        <div class="sidebar-top">
+
+
+            <div class="logo-area">
+
+                <img
+                    src="{{ url_for('static', filename='images/logo.png') }}"
+                    alt="CodeLens Logo"
+                    class="sidebar-logo">
+
+            </div>
+
+
+            <nav class="sidebar-nav">
+
+
+                <a href="{{ url_for('dashboard') }}"
+                   class="nav-item">
+
+                    <i class="fa-solid fa-house icon-dashboard"></i>
+
+                    <span>Dashboard</span>
+
+                </a>
+
+
+                <a href="{{ url_for('analyze') }}"
+                   class="nav-item">
+
+                    <i class="fa-solid fa-code icon-analyze"></i>
+
+                    <span>Analyze Code</span>
+
+                </a>
+
+
+                <a href="{{ url_for('results') }}"
+                   class="nav-item active">
+
+                    <i class="fa-solid fa-square-poll-vertical icon-results"></i>
+
+                    <span>Results</span>
+
+                </a>
+
+
+                <a href="{{ url_for('reports') }}"
+                   class="nav-item">
+
+                    <i class="fa-solid fa-file-lines icon-reports"></i>
+
+                    <span>Reports</span>
+
+                </a>
+
+
+                <a href="{{ url_for('saved_code') }}"
+                   class="nav-item">
+
+                    <i class="fa-solid fa-bookmark icon-saved"></i>
+
+                    <span>Saved Code</span>
+
+                </a>
+
+
+                <a href="{{ url_for('profile') }}"
+                   class="nav-item">
+
+                    <i class="fa-solid fa-user icon-profile"></i>
+
+                    <span>Profile</span>
+
+                </a>
+
+
+                <a href="{{ url_for('help_support') }}"
+                   class="nav-item">
+
+                    <i class="fa-solid fa-headset icon-help"></i>
+
+                    <span>Help &amp; Support</span>
+
+                </a>
+
+
+            </nav>
+
+        </div>
+
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <header class="top-header">
+
+
+            <div class="header-left">
+
+
+                <button
+                    class="sidebar-toggle"
+                    id="sidebarToggle"
+                    type="button"
+                    aria-label="Toggle sidebar">
+
+                    <i class="fi fi-rr-settings-sliders"></i>
+
+                </button>
+
+
+                <h1>Results</h1>
+
+
+            </div>
+
+
+            <div class="header-right">
+
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        id="resultsSearch"
+                        placeholder="Search...">
+
+                </div>
+
+
+                <div class="profile-area">
+
+                    <div class="header-avatar">
+
+                        {{ first_letter }}
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </header>
+
+
+        <!-- =================================================
+             RESULTS CONTENT
+        ================================================== -->
+
+        <section class="results-content">
+
+
+            <!-- =================================================
+                 PAGE TOP
+            ================================================== -->
+
+            <div class="results-top">
+
+
+                <div>
+
+                    <h2>Analysis Results</h2>
+
+                    <p>
+                        Review your code quality, issues and analysis metrics.
+                    </p>
+
+                </div>
+
+
+                <div class="results-actions">
+
+
+                    <button
+                        type="button"
+                        class="secondary-action"
+                        id="downloadReport">
+
+                        <i class="fi fi-sr-cloud-download-alt"></i>
+
+                        Generate Report
+
+                    </button>
+
+
+                    <a
+                        href="{{ url_for('analyze') }}"
+                        class="reanalyze-btn">
+
+                        <i class="fi fi-rr-refresh"></i>
+
+                        Analyze Code
+
+                    </a>
+
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 FILE INFORMATION
+            ================================================== -->
+
+            <div class="file-info-bar">
+
+
+                <div class="file-info-left">
+
+                    <i class="fi fi-rr-file-code"></i>
+
+                    <span>File:</span>
+
+                    <strong id="fileName">
+                        No analysis available
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 SCORE CARDS
+            ================================================== -->
+
+            <div class="score-grid">
+
+
+                <!-- Overall Quality -->
+
+                <div class="score-card">
+
+
+                    <div class="score-title">
+                        Overall Quality Score
+                    </div>
+
+
+                    <div class="score-body">
+
+
+                        <div class="score-circle blue-score">
+
+                            <div class="score-inner">
+
+                                <strong>0</strong>
+
+                                <span>/100</span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="score-info">
+
+                            <strong class="score-status">
+                                No Data
+                            </strong>
+
+                            <p>
+                                No analysis yet
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- Maintainability -->
+
+                <div class="score-card">
+
+
+                    <div class="score-title">
+                        Maintainability Index
+                    </div>
+
+
+                    <div class="score-body">
+
+
+                        <div class="score-circle green-score">
+
+                            <div class="score-inner">
+
+                                <strong>0</strong>
+
+                                <span>/100</span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="score-info">
+
+                            <strong class="score-status">
+                                No Data
+                            </strong>
+
+                            <p>
+                                No analysis yet
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- Complexity -->
+
+                <div class="score-card">
+
+
+                    <div class="score-title">
+                        Complexity Score
+                    </div>
+
+
+                    <div class="score-body">
+
+
+                        <div class="score-circle orange-score">
+
+                            <div class="score-inner">
+
+                                <strong>0</strong>
+
+                                <span>/50</span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="score-info">
+
+                            <strong class="score-status">
+                                No Data
+                            </strong>
+
+                            <p>
+                                No analysis yet
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- Readability -->
+
+                <div class="score-card">
+
+
+                    <div class="score-title">
+                        Readability Score
+                    </div>
+
+
+                    <div class="score-body">
+
+
+                        <div class="score-circle cyan-score">
+
+                            <div class="score-inner">
+
+                                <strong>0</strong>
+
+                                <span>/100</span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="score-info">
+
+                            <strong class="score-status">
+                                No Data
+                            </strong>
+
+                            <p>
+                                No analysis yet
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- Security -->
+
+                <div class="score-card">
+
+
+                    <div class="score-title">
+                        Security Score
+                    </div>
+
+
+                    <div class="score-body">
+
+
+                        <div class="score-circle purple-score">
+
+                            <div class="score-inner">
+
+                                <strong>0</strong>
+
+                                <span>/100</span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="score-info">
+
+                            <strong class="score-status">
+                                No Data
+                            </strong>
+
+                            <p>
+                                No analysis yet
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 MIDDLE SECTION
+            ================================================== -->
+
+            <div class="results-middle">
+
+
+                <!-- =================================================
+                     ISSUES FOUND
+                ================================================== -->
+
+                <div class="results-panel issues-panel">
+
+
+                    <div class="panel-header">
+
+
+                        <div>
+
+                            <h3>
+
+                                Issues Found
+
+                                <span>
+                                    (Total: 0)
+                                </span>
+
+                            </h3>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="issue-tabs">
+
+
+                        <button class="issue-tab active">
+
+                            All Issues
+
+                            <span>0</span>
+
+                        </button>
+
+
+                        <button class="issue-tab error-tab">
+
+                            Errors
+
+                            <span>0</span>
+
+                        </button>
+
+
+                        <button class="issue-tab warning-tab">
+
+                            Warnings
+
+                            <span>0</span>
+
+                        </button>
+
+
+                        <button class="issue-tab info-tab">
+
+                            Info
+
+                            <span>0</span>
+
+                        </button>
+
+
+                    </div>
+
+
+                    <div class="issue-table">
+
+
+                        <div class="issue-header">
+
+                            <span>Severity</span>
+
+                            <span>Issue</span>
+
+                            <span>Line</span>
+
+                            <span>Details</span>
+
+                        </div>
+
+
+                        <div class="issue-empty">
+
+
+                            <div class="empty-icon">
+
+                                <i class="fi fi-rr-check"></i>
+
+                            </div>
+
+
+                            <h4>
+                                No issues found
+                            </h4>
+
+
+                            <p>
+                                Run an analysis to see code issues here.
+                            </p>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- =================================================
+                     CODE METRICS
+                ================================================== -->
+
+                <div class="results-panel metrics-panel">
+
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Code Metrics
+                        </h3>
+
+                    </div>
+
+
+                    <div class="metrics-grid">
+
+
+                        <div class="metric-card">
+
+
+                            <div class="metric-icon green">
+
+                                <i class="fi fi-rr-document"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>Total Lines</span>
+
+                                <strong id="totalLines">
+                                    0
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+
+                            <div class="metric-icon blue">
+
+                                <i class="fi fi-rr-list"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>Code Lines</span>
+
+                                <strong id="codeLines">
+                                    0
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+
+                            <div class="metric-icon cyan">
+
+                                <i class="fi fi-rr-comment"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>Comment Lines</span>
+
+                                <strong id="commentLines">
+                                    0
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+
+                            <div class="metric-icon gray">
+
+                                <i class="fi fi-rr-file"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>Blank Lines</span>
+
+                                <strong id="blankLines">
+                                    0
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+
+                            <div class="metric-icon purple">
+
+                                <i class="fi fi-rr-code-branch"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>Functions</span>
+
+                                <strong id="functions">
+                                    0
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+
+                            <div class="metric-icon red">
+
+                                <i class="fi fi-rr-cube"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>Classes</span>
+
+                                <strong id="classes">
+                                    0
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+
+                            <div class="metric-icon blue">
+
+                                <i class="fi fi-rr-download"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>Imports</span>
+
+                                <strong id="imports">
+                                    0
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="metric-card">
+
+
+                            <div class="metric-icon green">
+
+                                <i class="fi fi-rr-globe"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>Global Vars</span>
+
+                                <strong id="globalVars">
+                                    0
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         LOGOUT MODAL
+    ====================================================== -->
+
+    <div class="modal-overlay" id="logoutModal">
+
+
+        <div class="logout-modal">
+
+
+            <div class="logout-icon">
+
+                <i class="fi fi-rr-exit"></i>
+
+            </div>
+
+
+            <h2>
+                Logout
+            </h2>
+
+
+            <p>
+                Are you sure you want to logout of CodeLens?
+            </p>
+
+
+            <div class="modal-actions">
+
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    id="cancelLogout">
+
+                    Cancel
+
+                </button>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for('logout') }}"
+                    id="logoutForm">
+
+
+                    <button
+                        type="submit"
+                        class="confirm-logout-btn">
+
+                        Logout
+
+                    </button>
+
+
+                </form>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- =====================================================
+     RESULTS JAVASCRIPT
+====================================================== -->
+
+<script src="{{ url_for('static', filename='js/theme.js') }}?v=21"></script>
+
+<script src="{{ url_for('static', filename='js/results.js') }}"></script>
+
+
+</body>
+
+</html>

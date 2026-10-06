@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Saved Code - CodeLens</title>
+
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+
+    <!-- Flaticon -->
+    <link rel="stylesheet"
+          href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+
+    <link rel="stylesheet"
+          href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
+
+
+    <!-- Saved Code CSS -->
+
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/save.css') }}?v=12">
+
+</head>
+
+
+<body>
+
+<div class="app-wrapper">
+
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-top">
+
+            <div class="logo-area">
+
+                <img
+                    src="{{ url_for('static', filename='images/logo.png') }}"
+                    alt="CodeLens Logo"
+                    class="sidebar-logo">
+
+            </div>
+
+
+            <nav class="sidebar-nav">
+
+                <a href="{{ url_for('dashboard') }}"
+                   class="nav-item">
+
+                    <i class="fa-solid fa-house icon-dashboard"></i>
+
+                    <span>Dashboard</span>
+
+                </a>
+
+
+                <a href="{{ url_for('analyze') }}"
+                   class="nav-item">
+
+                    <i class="fa-solid fa-code icon-analyze"></i>
+
+                    <span>Analyze Code</span>
+
+                </a>
+
+
+                <a href="{{ url_for('results') }}"
+                   class="nav-item">
+
+                    <i class="fa-solid fa-square-poll-vertical icon-results"></i>
+
+                    <span>Results</span>
+
+                </a>
+
+
+            
+
+
+                <a href="{{ url_for('reports') }}"
+                   class="nav-item">
+
+                    <i class="fa-solid fa-file-lines icon-reports"></i>
+
+                    <span>Reports</span>
+
+                </a>
+
+
+                <!-- SAVED CODE ACTIVE -->
+
+                <a href="{{ url_for('saved_code') }}"
+                   class="nav-item active">
+
+                    <i class="fa-solid fa-bookmark icon-saved"></i>
+
+                    <span>Saved Code</span>
+
+                </a>
+
+
+                <a href="{{ url_for('profile') }}"
+                   class="nav-item">
+
+                    <i class="fa-solid fa-user icon-profile"></i>
+
+                    <span>Profile</span>
+
+                </a>
+
+
+                <a href="{{ url_for('help_support') }}"
+                   class="nav-item">
+
+                    <i class="fa-solid fa-headset icon-help"></i>
+
+                    <span>Help &amp; Support</span>
+
+                </a>
+
+            </nav>
+
+        </div>
+
+
+        
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             HEADER
+             ================================================= -->
+
+        <header class="top-header">
+
+            <div class="header-left">
+
+                <button type="button"
+                        class="sidebar-toggle"
+                        id="sidebarToggle">
+
+                    <i class="fi fi-rr-settings-sliders"></i>
+
+                </button>
+
+
+                <h1>Saved Code</h1>
+
+            </div>
+
+
+            <div class="header-right">
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        id="globalSearch"
+                        placeholder="Search..."
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false">
+
+                </div>
+
+
+                
+
+                <div class="header-avatar">
+
+    {{ first_letter }}
+
+</div>
+                
+
+        </header>
+
+
+
+        <!-- =================================================
+             PAGE CONTENT
+             ================================================= -->
+
+        <section class="saved-content">
+
+
+            <!-- PAGE HEADING -->
+
+            <div class="page-heading">
+
+                <div>
+
+                    <h2>Saved Code</h2>
+
+                    <p>
+                        View and manage your saved code.
+                    </p>
+
+                </div>
+
+
+                <button type="button"
+                        class="new-code-btn"
+                        id="newCodeButton">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    <span>New Code</span>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 TOOLBAR
+                 ================================================= -->
+
+            <div class="saved-toolbar">
+
+
+                <div class="toolbar-search">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        id="savedSearch"
+                        placeholder="Search saved code..."
+                        autocomplete="off">
+
+                </div>
+
+
+                <select id="languageFilter">
+
+                    <option value="all">
+                        All Languages
+                    </option>
+
+                    <option value="python">
+                        Python
+                    </option>
+
+                    <option value="java">
+                        Java
+                    </option>
+
+                    
+
+                    <option value="cpp">
+                        C++
+                    </option>
+
+                   
+
+                </select>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 SAVED CODE LIST
+                 ================================================= -->
+
+            <div class="saved-list"
+                 id="savedList">
+
+
+                <!-- EMPTY STATE -->
+
+                <div class="empty-state"
+                     id="emptyState">
+
+                    <div class="empty-icon">
+
+                        <i class="fa-regular fa-bookmark"></i>
+
+                    </div>
+
+
+                    <h3>No Saved Code</h3>
+
+
+                    <p>
+                        Your saved code snippets will appear here.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================================
+     LOGOUT MODAL
+     ========================================================= -->
+
+<div class="modal-overlay"
+     id="logoutModal">
+
+    <div class="confirmation-modal">
+
+
+        <div class="modal-icon logout-modal-icon">
+
+            <i class="fa-solid fa-right-from-bracket"></i>
+
+        </div>
+
+
+        <h3>Logout</h3>
+
+
+        <p>
+            Are you sure you want to logout from CodeLens?
+        </p>
+
+
+        <div class="modal-actions">
+
+            <button type="button"
+                    class="modal-cancel"
+                    id="cancelLogout">
+
+                Cancel
+
+            </button>
+
+
+            <button type="button"
+                    class="modal-confirm"
+                    id="confirmLogout">
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script src="{{ url_for('static', filename='js/theme.js') }}?v=21"></script>
+
+<script src="{{ url_for('static', filename='js/save.js') }}?v=11"></script>
+
+
+</body>
+
+</html>

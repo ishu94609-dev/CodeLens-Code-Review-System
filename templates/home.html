@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Code Review  System</title>
+
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/home.css') }}?v=25">
+
+<body>
+
+    <div class="landing-page">
+
+        <div class="content">
+
+            <!-- CODELENS LOGO -->
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='images/logo.png') }}"
+                     alt="CodeLens Logo">
+            </div>
+
+
+            <!-- PROJECT TITLE -->
+            <h1>
+                Code Review System                
+</h1>
+
+            <!-- TAGLINE -->
+            <p class="tagline">
+                Analyze -&gt; Improve -&gt; Build Better Code
+            </p>
+
+
+            <!-- DESCRIPTION -->
+            <p class="description">
+                A powerful system for analyzing source code,
+                identifying quality issues for better code quality.
+            </p>
+
+
+            <!-- GET STARTED BUTTON -->
+            <a href="{{ url_for('login') }}"
+               class="get-started">
+
+                <span>Get Started</span>
+
+                <span class="arrow">→</span>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

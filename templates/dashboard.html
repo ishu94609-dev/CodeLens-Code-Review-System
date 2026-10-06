@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard - CodeLens</title>
+
+    <script>
+        (function () {
+            const theme = localStorage.getItem("codeLensTheme") || "dark";
+            document.documentElement.setAttribute("data-theme", theme);
+        })();
+    </script>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Flaticon UIcons -->
+<link rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css">
+
+<link rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
+
+<link rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/4.0.0/uicons-thin-straight/css/uicons-thin-straight.css">
+
+
+
+      <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}?v=24">
+</head>
+
+<body>
+
+<div class="dashboard-wrapper dark-blue-ui">
+    <!-- ================= SIDEBAR ================= -->
+
+    
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-top">
+
+            <div class="logo-area">
+    <img src="{{ url_for('static', filename='images/logo.png') }}"
+         alt="CodeLens Logo"
+         class="sidebar-logo">
+</div>
+
+            <nav class="sidebar-nav">
+
+                <a href="{{ url_for('dashboard') }}"
+                   class="nav-item active">
+                    <i class="fa-solid fa-house icon-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="{{ url_for('analyze') }}"
+                   class="nav-item">
+                    <i class="fa-solid fa-code icon-analyze"></i>
+                    <span>Analyze Code</span>
+                </a>
+
+                <!-- Changed Results icon -->
+                <a href="{{ url_for('results') }}"
+                   class="nav-item">
+                    <i class="fa-solid fa-square-poll-vertical icon-results"></i>
+                    <span>Results</span>
+                </a>
+
+               
+
+                <a href="{{ url_for('reports') }}"
+                   class="nav-item">
+                    <i class="fa-solid fa-file-lines icon-reports"></i>
+                    <span>Reports</span>
+                </a>
+
+                <a href="{{ url_for('saved_code') }}"
+                   class="nav-item">
+                    <i class="fa-solid fa-bookmark icon-saved"></i>
+                    <span>Saved Code</span>
+                </a>
+
+                <a href="{{ url_for('profile') }}"
+                   class="nav-item">
+                    <i class="fa-solid fa-user icon-profile"></i>
+                    <span>Profile</span>
+                </a>
+
+
+                <a href="{{ url_for('help_support') }}"
+                   class="nav-item">
+                    <i class="fa-solid fa-headset icon-help"></i>
+                    <span>Help &amp; Support</span>
+                </a>
+
+            </nav>
+
+        </div>
+
+
+        <!-- ONLY LOGOUT AT BOTTOM -->
+        <div class="sidebar-bottom">
+
+            <form method="POST"
+                  action="{{ url_for('logout') }}"
+                  id="logoutForm">
+
+                <button type="button"
+                        class="logout-btn"
+                        id="logoutButton">
+
+                    <i class="fi fi-sr-user-logout"></i>
+                    <span>Logout</span>
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <main class="main-content">
+
+        <!-- HEADER -->
+
+        <header class="top-header">
+
+    <div class="header-left">
+
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            type="button"
+            aria-label="Toggle sidebar">
+            <i class="fi fi-rr-settings-sliders"></i>
+        </button>
+
+        <h1>Dashboard</h1>
+
+    </div>
+
+    <div class="header-right">
+
+        <!-- Search -->
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input
+                type="text"
+                id="dashboardSearch"
+                placeholder="Search...">
+        </div>
+
+       
+
+        <!-- Profile -->
+        <div class="profile-area">
+    <div class="header-avatar">
+        {{ first_letter }}
+    </div>
+</div>
+
+    </div>
+
+</header>
+
+        <!-- ================= DASHBOARD ================= -->
+
+        <section class="dashboard-content">
+
+            <!-- WELCOME -->
+
+            <div class="welcome-section">
+
+                <div>
+
+                    <h1>
+                        Welcome back, {{ display_name }}! 👋
+                    </h1>
+
+                    <p>
+                        Monitor your code quality and review activity.
+                    </p>
+
+                </div>
+
+                <button class="generate-report-btn"
+                        type="button">
+
+                    <i class="fi fi-sr-cloud-download-alt"></i>
+                    Generate Report
+
+                </button>
+
+            </div>
+
+
+            <!-- ================= STAT CARDS ================= -->
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon blue">
+    <i class="fa-solid fa-file-circle-check"></i>
+</div>
+
+                    <div class="stat-content">
+                        <span>Total Analyses</span>
+                        <h2>0</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon red">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+
+                    <div class="stat-content">
+                        <span>Issues Found</span>
+                        <h2>0</h2>
+                    </div>
+
+                </div>
+
+
+                
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon pink">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+
+                    <div class="stat-content">
+                        <span>Reports</span>
+                        <h2>0</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon green">
+                        <i class="fa-solid fa-bookmark"></i>
+                    </div>
+
+                    <div class="stat-content">
+                        <span>Saved Code</span>
+                        <h2>0</h2>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= ANALYZE CODE ================= -->
+
+            <div class="analyze-card">
+
+                <div class="analyze-info">
+
+                    <div class="analyze-icon">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+
+                    <div>
+
+                        <h2>Analyze your code</h2>
+
+                        <p>
+                            Review your code for quality, reliability,
+                            security and maintainability issues.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <a href="{{ url_for('analyze') }}"
+                   class="analyze-button">
+
+                    <i class="fa-solid fa-code"></i>
+                    Analyze Code
+
+                </a>
+
+            </div>
+
+
+            <!-- ================= LOWER SECTION ================= -->
+
+            <div class="lower-section">
+
+
+                <!-- ================= RECENT ANALYSES ================= -->
+
+                <div class="dashboard-card recent-card">
+
+                    <div class="card-header">
+
+                        <div class="card-title">
+
+                            <div class="title-icon recent-icon">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </div>
+
+                            <h2>Recent Analyses</h2>
+
+                        </div>
+
+                        
+
+                    </div>
+
+
+                    <!-- TABLE -->
+
+                    <div class="analysis-table-wrapper">
+
+                        <table class="analysis-table">
+
+                            <thead>
+    <tr>
+        <th>
+            <i class="fa-solid fa-folder-open"></i>
+            File / Repository
+        </th>
+        <th>
+            <i class="fa-solid fa-code"></i>
+            Type
+        </th>
+        <th>
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Issues
+        </th>
+        <th>
+            <i class="fa-regular fa-clock"></i>
+            Date
+        </th>
+    </tr>
+</thead>
+                            <tbody>
+
+                                <tr class="empty-table-row">
+
+                                    <td colspan="4">
+
+                                        <div class="table-empty-state">
+
+                                            <div class="table-empty-icon">
+                                                <i class="fa-solid fa-chart-simple"></i>
+                                            </div>
+
+                                            <h3>No analyses yet</h3>
+
+                                            <p>
+                                                Your recent code analyses
+                                                will appear here.
+                                            </p>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================= CODE QUALITY ================= -->
+
+                <div class="dashboard-card quality-card">
+
+                    <div class="card-header">
+
+                        <div class="card-title">
+
+                            <div class="title-icon quality-title-icon">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+
+                            <h2>Code Quality Review</h2>
+
+                        </div>
+
+
+                        <select id="qualityPeriod">
+
+                            <option value="7">
+                                Last 7 Days
+                            </option>
+
+                            <option value="30">
+                                Last 30 Days
+                            </option>
+
+                            <option value="90">
+                                Last 90 Days
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="quality-content">
+
+                        <!-- DONUT -->
+
+                        <div class="quality-donut-area">
+
+                            <div class="quality-donut">
+
+                                <div class="donut-center">
+
+                                    <span>0%</span>
+
+                                    <small>Quality</small>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- QUALITY DETAILS -->
+
+                        <div class="quality-details">
+
+
+                            <div class="quality-item">
+    <i class="fa-solid fa-star"></i>
+    <span>Code Quality</span>
+    <strong>0%</strong>
+</div>
+
+<div class="quality-item">
+    <i class="fa-solid fa-screwdriver-wrench"></i>
+    <span>Maintainability</span>
+    <strong>0%</strong>
+</div>
+
+<div class="quality-item">
+    <i class="fa-solid fa-circle-check"></i>
+    <span>Reliability</span>
+    <strong>0%</strong>
+</div>
+
+<div class="quality-item">
+    <i class="fa-solid fa-shield-halved"></i>
+    <span>Security</span>
+    <strong>0%</strong>
+</div>
+
+<div class="quality-item">
+    <i class="fa-solid fa-book-open"></i>
+    <span>Readability</span>
+    <strong>0%</strong>
+</div>
+                                
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- ================= LOGOUT MODAL ================= -->
+
+<div class="modal-overlay"
+     id="logoutModal">
+
+    <div class="logout-modal">
+
+        <div class="logout-icon">
+
+            <i class="fi fi-sr-user-logout"></i>
+        </div>
+
+        <h2>Logout</h2>
+
+        <p>
+            Are you sure you want to logout of CodeLens?
+        </p>
+
+        <div class="modal-actions">
+
+            <button type="button"
+                    class="cancel-btn"
+                    id="cancelLogout">
+                Cancel
+            </button>
+
+            <button type="button"
+                    class="confirm-logout-btn"
+                    id="confirmLogout">
+                Logout
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="{{ url_for('static', filename='js/theme.js') }}?v=21"></script>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}?v=23"></script>
+
+</body>
+</html>

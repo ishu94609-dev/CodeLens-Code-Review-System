@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Register - Code Review & Refactoring System</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/register.css') }}?v=30">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+<div class="page">
+
+    <!-- LOGO -->
+    <div class="logo-container">
+        <img src="{{ url_for('static', filename='images/logo.png') }}"
+             alt="CodeLens Logo">
+    </div>
+
+
+    <!-- REGISTER CARD -->
+    <div class="register-card">
+
+        <h2>Create Account</h2>
+
+        <p class="subtitle">
+            Register to get started
+        </p>
+
+        {% if error %}
+        <div class="register-error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+
+        <!-- REGISTER FORM -->
+        <form id="registerForm"
+              method="POST"
+              action="{{ url_for('register') }}">
+
+            <!-- FULL NAME -->
+            <div class="input-box">
+
+                <div class="input-icon">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+
+                <input
+                    type="text"
+                    name="full_name"
+                    placeholder="Full Name"
+                    autocomplete="name"
+                    required>
+
+            </div>
+
+
+            <!-- EMAIL -->
+            <div class="input-box">
+
+                <div class="input-icon">
+                    <i class="fa-regular fa-envelope"></i>
+                </div>
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Email Address"
+                    autocomplete="email"
+                    required>
+
+            </div>
+
+
+            <!-- USERNAME -->
+            <div class="input-box">
+
+                <div class="input-icon">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Username"
+                    autocomplete="username"
+                    required>
+
+            </div>
+
+
+            <!-- PASSWORD -->
+            <div class="input-box">
+
+                <div class="input-icon">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+
+                <input
+                    type="password"
+                    name="password"
+                    id="registerPassword"
+                    placeholder="Password"
+                    autocomplete="new-password"
+                    required>
+
+                <button
+                    type="button"
+                    class="eye-button"
+                    onclick="toggleRegisterPassword()">
+
+                    <i
+                        class="fa-regular fa-eye"
+                        id="registerEye">
+                    </i>
+
+                </button>
+
+            </div>
+
+
+            <!-- CONFIRM PASSWORD -->
+            <div class="input-box">
+
+                <div class="input-icon">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+
+                <input
+                    type="password"
+                    name="confirm_password"
+                    id="confirmPassword"
+                    placeholder="Confirm Password"
+                    autocomplete="new-password"
+                    required>
+
+                <button
+                    type="button"
+                    class="eye-button"
+                    onclick="toggleConfirmPassword()">
+
+                    <i
+                        class="fa-regular fa-eye"
+                        id="confirmEye">
+                    </i>
+
+                </button>
+
+            </div>
+
+
+            <!-- REGISTER -->
+            <button
+                type="submit"
+                class="register-button"
+                id="registerButton">
+
+                Register
+
+            </button>
+
+        </form>
+
+
+        <!-- LOGIN -->
+        <div class="login-text">
+
+            Already have an account?
+
+            <a href="{{ url_for('login') }}">
+                Login here
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+    <div class="footer">
+
+        <div class="footer-line">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            <span>
+                © 2026 Code Review System.
+            </span>
+
+        </div>
+
+        <div class="footer-rights">
+            All rights reserved.
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* ================================
+   PASSWORD TOGGLE
+================================ */
+
+function toggleRegisterPassword() {
+
+    const password =
+        document.getElementById("registerPassword");
+
+    const eye =
+        document.getElementById("registerEye");
+
+    if (password.type === "password") {
+
+        password.type = "text";
+
+        eye.classList.remove("fa-eye");
+        eye.classList.add("fa-eye-slash");
+
+    } else {
+
+        password.type = "password";
+
+        eye.classList.remove("fa-eye-slash");
+        eye.classList.add("fa-eye");
+    }
+}
+
+
+function toggleConfirmPassword() {
+
+    const password =
+        document.getElementById("confirmPassword");
+
+    const eye =
+        document.getElementById("confirmEye");
+
+    if (password.type === "password") {
+
+        password.type = "text";
+
+        eye.classList.remove("fa-eye");
+        eye.classList.add("fa-eye-slash");
+
+    } else {
+
+        password.type = "password";
+
+        eye.classList.remove("fa-eye-slash");
+        eye.classList.add("fa-eye");
+    }
+}
+
+
+/* ================================
+   REGISTER FORM
+================================ */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("registerForm");
+    const button = document.getElementById("registerButton");
+
+    if (!form) {
+        console.error("Register form not found.");
+        return;
+    }
+
+    form.addEventListener("submit", function (event) {
+
+        console.log("REGISTER FORM SUBMIT");
+
+        const password =
+            document.getElementById("registerPassword").value;
+
+        const confirmPassword =
+            document.getElementById("confirmPassword").value;
+
+        if (password !== confirmPassword) {
+
+            event.preventDefault();
+
+            alert("Passwords do not match.");
+
+            return;
+        }
+
+        if (password.length < 6) {
+
+            event.preventDefault();
+
+            alert("Password must contain at least 6 characters.");
+
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "Creating Account...";
+
+        /*
+         IMPORTANT:
+         Do NOT preventDefault here.
+         Browser will submit the form to Flask.
+        */
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>
