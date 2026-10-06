@@ -3,3 +3,4 @@ Authlib
 python-dotenv
 requests
 reportlab
+gunicorn
