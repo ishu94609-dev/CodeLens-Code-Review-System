@@ -1,5 +1,0 @@
-Flask
-Authlib
-python-dotenv
-requests
-reportlab
