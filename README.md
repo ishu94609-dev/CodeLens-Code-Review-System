@@ -107,3 +107,10 @@ The main objective of the system is to help developers understand potential prob
      |         |
      v         v
  Results     PDF Reports
+
+ ## Live Demo
+
+The CodeLens – Code Review System is deployed and available online.
+
+**Live Website:**  
+https://codelens-code-review-system.onrender.com/
